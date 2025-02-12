@@ -16,13 +16,20 @@ var dbConn = mysql.createConnection({
   port: process.env.DB_PORT,
 });
 
-dbConn.connect();
+dbConn.connect((err) => {
+  if (err) {
+    console.error("❌ Database connection failed: ", err.message);
+    process.exit(1); 
+  } else {
+    console.log("✅ Database connected successfully!");
 
-
-
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
+    app.listen(3000, () => {
+      console.log("🚀 Server is running on port 3000");
+    });
+  }
 });
+
+
 
 
 module.exports = {app,dbConn};
@@ -30,7 +37,10 @@ module.exports = {app,dbConn};
 // ================================================================================
 const { getRoomByFloor } = require("../controller/RoomController");
 const { testController } = require("../controller/TestController");
+const { loginVerify } = require("../controller/UserController");
 
+app.post("/login_verify", loginVerify);
 app.get("/get-room/:floor", getRoomByFloor);
+
 
 // ================================================================================
