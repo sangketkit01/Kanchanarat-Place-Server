@@ -2,6 +2,8 @@ let express = require("express");
 let app = express();
 let bodyParser = require("body-parser");
 let mysql = require("mysql");
+const path = require("path");
+const bcrypt = require("bcryptjs");
 
 require("dotenv").config();
 
@@ -19,7 +21,7 @@ var dbConn = mysql.createConnection({
 dbConn.connect((err) => {
   if (err) {
     console.error("❌ Database connection failed: ", err.message);
-    process.exit(1); 
+    process.exit(1);
   } else {
     console.log("✅ Database connected successfully!");
 
@@ -29,18 +31,24 @@ dbConn.connect((err) => {
   }
 });
 
+module.exports = { app, dbConn, bcrypt };
 
-
-
-module.exports = {app,dbConn};
-
-// ================================================================================
-const { getRoomByFloor } = require("../controller/RoomController");
+// Routes
+const upload = require("../config/multer");
+const { getRoomByFloor, reserveRoom, checkReservation, getReservation, allReserved, getOneRoom, approveReservation } = require("../controller/RoomController");
 const { testController } = require("../controller/TestController");
 const { loginVerify } = require("../controller/UserController");
 
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 app.post("/login_verify", loginVerify);
+
 app.get("/get-room/:floor", getRoomByFloor);
+app.get("/get-one-room/:room_id", getOneRoom);
 
+app.put("/reserving-room/:room_id", upload.single("slip_part"), reserveRoom);
+app.post("/check-reservation",checkReservation);
+app.get("/getReservation/:reservation_id",getReservation)
 
-// ================================================================================
+app.get("/allReserved",allReserved)
+app.post("/approve-reservation/:reservation_id",approveReservation)

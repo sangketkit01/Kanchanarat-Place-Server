@@ -1,8 +1,34 @@
 const { dbConn } = require("../server/server");
 
+const register = (req, res) => {
+  dbConn.query(
+    `INSERT INTO members (room_id,role_id,username, password, name,
+    email,phone,card_number) VALUES (?, ?, ?,?,?, ?, ?, ?)`,
+    [
+      req.body.room_id, req.body.role_id, req.body.username, req.body.password, req.body.name, 
+      req.body.email, req.body.phone, req.body.card_number
+    ],
+
+    (error, results) => {
+      if (error) {
+        return res
+          .status(500)
+          .json({ error: "Database query failed", details: error.message });
+      }
+      res.status(200).json({ message: "User registered successfully" });
+    }
+  );
+};
+
 const loginVerify = (req, res) => {
   dbConn.query(
-    `SELECT * FROM members WHERE username = ? AND password = ?`,
+    `SELECT members.member_id, rooms.room_code, roles.role_name,
+       members.username, members.name, members.email,
+       members.phone, members.card_number
+    FROM members 
+    JOIN rooms ON members.room_id = rooms.room_id
+    JOIN roles ON members.role_id = roles.role_id
+    WHERE members.username = ? AND members.password = ?`,
     [req.body.username, req.body.password],
     (error, results) => {
       if (error) {
@@ -15,7 +41,20 @@ const loginVerify = (req, res) => {
           .status(401)
           .json({ message: "Invalid username or password" });
       }
-      res.status(200).json({ message: "Login successful", user: results[0] });
+
+      const user = results[0];
+
+      res.status(200).json({
+        message: "Login successful",
+        member_id: user.member_id,
+        room_code: user.room_code,
+        role_name: user.role_name,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        card_number: user.card_number,
+      });
     }
   );
 };
