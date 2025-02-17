@@ -35,7 +35,7 @@ module.exports = { app, dbConn, bcrypt };
 
 // Routes
 const upload = require("../config/multer");
-const { getRoomByFloor, reserveRoom, checkReservation, getReservation, allReserved, getOneRoom, approveReservation } = require("../controller/RoomController");
+const { getRoomByFloor, reserveRoom, checkReservation, getReservation, allReserved, getOneRoom, approveReservation, insertContract, getNewContracts } = require("../controller/RoomController");
 const { testController } = require("../controller/TestController");
 const { loginVerify } = require("../controller/UserController");
 
@@ -52,3 +52,7 @@ app.get("/getReservation/:reservation_id",getReservation)
 
 app.get("/allReserved",allReserved)
 app.post("/approve-reservation/:reservation_id",approveReservation)
+
+app.post("/insert-contract", upload.single("slip_part"), insertContract);
+
+app.get("/get-new-contracts",getNewContracts)
