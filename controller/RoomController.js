@@ -22,6 +22,24 @@ function getOneRoom(req, res) {
   );
 }
 
+function makeRoomUnavailable(req, res) {
+  dbConn.query(
+    `UPDATE rooms SET status_id = 2 WHERE room_id = ?`,
+    [req.params.room_id],
+    (error, results) =>{
+      if (error) {
+        console.error("Error:", error);
+        res.status(500).json({
+          status: "error",
+          message: "เกิดข้อผิดพลาดในการอัพเดทข้อมูล",
+          error: error,
+        });
+      } else {
+        res.send(results);
+      }
+    }
+)}
+
 function reserveRoom(req, res) {
   try {
     if (!req.file) {
@@ -252,6 +270,28 @@ function getNewContracts(req, res) {
   );
 }
 
+function approveContract(req, res) {
+  dbConn.query(
+    `UPDATE contracts SET status_id = 6 WHERE contract_id = ?`,
+    [req.params.contract_id],
+    (error, results) => {
+      if(error) {
+        console.error("Error:", error);
+        res.status(500).json({
+          status: "error",
+          message: "เกิดข้อผิดพลาดในการอัพเดทข้อมูล",
+          error: error,
+        });
+      }else{
+        res.status(201).json({
+          status: "success",
+          message: "อนุมัติสัญญาเรียบร้อย",
+        });
+      }
+    }
+  );
+}
+
 
 module.exports = {
   getRoomByFloor,
@@ -263,4 +303,6 @@ module.exports = {
   approveReservation,
   insertContract,
   getNewContracts,
+  approveContract,
+  makeRoomUnavailable
 };

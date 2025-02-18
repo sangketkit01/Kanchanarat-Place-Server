@@ -22,16 +22,12 @@ const register = (req, res) => {
 
 const loginVerify = (req, res) => {
   dbConn.query(
-    `SELECT members.member_id, rooms.room_code, roles.role_name,
-       members.username, members.name, members.email,
-       members.phone, members.card_number
-    FROM members 
-    JOIN rooms ON members.room_id = rooms.room_id
-    JOIN roles ON members.role_id = roles.role_id
+    `SELECT * FROM members
     WHERE members.username = ? AND members.password = ?`,
     [req.body.username, req.body.password],
     (error, results) => {
       if (error) {
+        console.error("Error:", error);
         return res
           .status(500)
           .json({ error: "Database query failed", details: error.message });
@@ -42,19 +38,7 @@ const loginVerify = (req, res) => {
           .json({ message: "Invalid username or password" });
       }
 
-      const user = results[0];
-
-      res.status(200).json({
-        message: "Login successful",
-        member_id: user.member_id,
-        room_code: user.room_code,
-        role_name: user.role_name,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        card_number: user.card_number,
-      });
+      res.send(results[0]);
     }
   );
 };
