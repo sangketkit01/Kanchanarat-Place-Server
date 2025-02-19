@@ -107,7 +107,7 @@ function checkReservation(req, res) {
   dbConn.query(
     `SELECT * FROM reservations WHERE name = ? AND phone = ?`,
     [req.body.name, req.body.phone],
-    (error, results) =>{
+    (error, results) => {
       if (error) {
         console.error("Error:", error);
         res.status(500).json({
@@ -115,8 +115,13 @@ function checkReservation(req, res) {
           message: "เกิดข้อผิดพลาดในการอัพเดทข้อมูล",
           error: error,
         });
+      } else if (results.length === 0) {
+        res.status(404).json({
+          status: "not_found",
+          message: "ไม่พบข้อมูลการจอง",
+        });
       } else {
-        res.send(results[0]);
+        res.json(results[0]);
       }
     }
   );
@@ -180,9 +185,6 @@ function approveReservation(req, res) {
 
 function insertContract(req, res) {
   try {
-    console.log("req.file:", req.file);
-    console.log("req.body:", req.body);
-
     if (!req.file) {
       console.log("กรุณาอัพโหลดสลิปการโอนเงิน");
       return res.status(400).json({

@@ -39,7 +39,7 @@ const { getRoomByFloor, reserveRoom, checkReservation, getReservation, allReserv
   insertContract, getNewContracts, makeRoomUnavailable, approveContract } = require("../controller/RoomController");
 const { testController } = require("../controller/TestController");
 const { loginVerify } = require("../controller/UserController");
-const { createBill, getBill } = require("../controller/PaymentController");
+const { createBill, getBill, getLatestBill, getRoomBills, payBill } = require("../controller/PaymentController");
 
 app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
@@ -61,3 +61,6 @@ app.post("/approve-contract/:contract_id",approveContract)
 
 app.post("/create-bill",createBill)
 app.get("/get-bill/:room_id/:month/:year",getBill)
+app.get("/get-latest-bill/:room_id",getLatestBill)
+app.get("/get-room-bills/:room_id",getRoomBills)
+app.post("/pay-bill/:bill_id", upload.single("slip_part"), payBill);
