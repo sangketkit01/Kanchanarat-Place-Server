@@ -43,4 +43,58 @@ const loginVerify = (req, res) => {
   );
 };
 
-module.exports = { loginVerify };
+const updateProfile = (req, res) => {
+  try {
+    console.log("req.file", req.file);
+    console.log("req.body", req.body);
+
+    const memberId = req.params.member_id;
+    const { name, email, phone, birth_date } = req.body;
+
+    if (!name || !email || !phone || !birth_date) {
+      return res.status(400).json({
+        success: false,
+        message: "กรุณากรอกข้อมูลให้ครบถ้วน",
+      });
+    }
+
+    const updateData = {
+      name,
+      email,
+      phone,
+      birth_date,
+    };
+
+    if (req.file) {
+      updateData.profile_image = req.file.path;
+    }
+
+
+    const params = [name, email, phone, birth_date];
+
+    if (req.file) {
+      params.push(req.file.path);
+    }
+
+    params.push(memberId);
+
+
+    return res.status(200).json({
+      success: true,
+      message: "อัปเดตโปรไฟล์สำเร็จ",
+      data: {
+        member_id: memberId,
+        ...updateData,
+      },
+    });
+  } catch (error) {
+    console.error("Error updating profile:", error);
+    return res.status(500).json({
+      success: false,
+      message: "เกิดข้อผิดพลาดในการอัปเดตโปรไฟล์",
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { loginVerify , updateProfile, register , updateProfile };
